@@ -21,14 +21,24 @@
 #include <pthread.h>
 
 
+enum errors {
+    CONNECTION_TERMINATED = 1,
+    PARAMS_ERROR = 2,
+    SYSTEM_ERROR = 3,
+    UID_ERROR = 4,
+    OOM_ERROR = 5,
+};
+
+
+
 void printUsage() {
     fputs("Usage: termux-gui.bash-helper [--main] sockname\n", stderr);
-    exit(2);
+    exit(PARAMS_ERROR);
 }
 
 void printError(const char* msg) {
     perror(msg);
-    exit(3);
+    exit(SYSTEM_ERROR);
 }
 
 
@@ -53,7 +63,7 @@ void read_block(int fd, void* buffer, int size) {
     while (toread > 0) {
         int ret = read(fd, buffer + (size - toread), toread);
         if (ret <= 0) {
-            exit(1);
+            exit(CONNECTION_TERMINATED);
         }
         toread -= ret;
     }
@@ -64,7 +74,7 @@ void write_block(int fd, void* buffer, int size) {
     while (towrite > 0) {
         int ret = write(fd, buffer + (size - towrite), towrite);
         if (ret <= 0) {
-            exit(1);
+            exit(CONNECTION_TERMINATED);
         }
         towrite -= ret;
     }
@@ -76,7 +86,7 @@ void* send_thread(void* unused) {
     out_buffer = calloc(out_buffer_size, 1);
     if (out_buffer == NULL) {
         fputs("Could not allocate out buffer", stderr);
-        exit(5);
+        exit(OOM_ERROR);
     }
     int towrite = 0;
     while (true) {
@@ -85,12 +95,12 @@ void* send_thread(void* unused) {
             out_buffer = realloc(out_buffer, out_buffer_size);
             if (out_buffer == NULL) {
                 fputs("Could not allocate out buffer", stderr);
-                exit(5);
+                exit(OOM_ERROR);
             }
         }
         int ret = read(0, out_buffer + towrite, 1);
         if (ret <= 0) {
-            exit(1);
+            exit(CONNECTION_TERMINATED);
         }
         towrite++;
         if (out_buffer[towrite-1] == separator) {
@@ -166,20 +176,20 @@ int main(int argc, char** argv) {
     
     if (cred.uid != getuid()) {
         fprintf(stderr, "Refused connection from UID %d\n", cred.uid);
-        exit(4);
+        exit(UID_ERROR);
     }
     
     if (main) {
         uint8_t byte = 1;
-        if (write(socket_fd, &byte, 1) <= 0) exit(1);
-        if (read(socket_fd, &byte, 1) <= 0) exit(1);
+        if (write(socket_fd, &byte, 1) <= 0) exit(CONNECTION_TERMINATED);
+        if (read(socket_fd, &byte, 1) <= 0) exit(CONNECTION_TERMINATED);
         if (byte != 0) {
             fputs("Protocol negotiation failed\n", stderr);
-            exit(1);
+            exit(CONNECTION_TERMINATED);
         }
         if (pthread_create(&send_thread_handle, NULL, send_thread, NULL) != 0) {
             fputs("Could not create send thread\n", stderr);
-            exit(3);
+            exit(SYSTEM_ERROR);
         }
     }
     
@@ -200,7 +210,7 @@ int main(int argc, char** argv) {
             toread -= r;
         }
         if (write(1, &separator, 1) <= 0) {
-            exit(1);
+            exit(CONNECTION_TERMINATED);
         }
     }
     

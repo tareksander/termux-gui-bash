@@ -15,10 +15,8 @@ set(version 1.0)
 
 add_custom_command(
     OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1.gz"
-    COMMAND pandoc
-    ARGS -M "header=tgui-bash manual" -M "section=1" -M "title=tgui-bash" -M "footer=Version ${version}" -s -t man -o "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1" "${CMAKE_CURRENT_SOURCE_DIR}/tgui-bash.1.md"
     COMMAND gzip ARGS -f "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1"
-    MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/tgui-bash.1.md"
+    MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/tgui-bash.1"
     VERBATIM)
 
 
@@ -34,5 +32,4 @@ configure_file(src/tgui-bash.sh tgui-bash @ONLY)
 
 install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash" TYPE BIN)
 install(TARGETS termux-gui-bash-helper RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/libexec")
-
-
+install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/man/man1/tgui-bash.1.gz")

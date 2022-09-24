@@ -1,7 +1,7 @@
 # Termux:GUI Bash
-Bash library for Termux:GUI
+Bash library for Termux:GUI.
 
-
+[Documentation](Manual.md)
 
 
 ### Dependencies
