@@ -1,8 +1,8 @@
 #!@TERMUX_PREFIX@/bin/bash
 
 
-if [ $# -ne 1 ] && ! (return 0 2>/dev/null); then
-  echo 'Usage: tgui-bash path' >&2
+if [ $# -lt 1 ] && ! (return 0 2>/dev/null); then
+  echo 'Usage: tgui-bash path ...' >&2
   exit 1
 fi
 
@@ -31,16 +31,49 @@ function tg__hex_to_dec() {
 
 ### CONSTANTS
 
-declare -r tg_actvivity_tid="tid"
-declare -r tg_actvivity_dialog="dialog"
-declare -r tg_actvivity_canceloutside="canceloutside"
-declare -r tg_actvivity_pip="pip"
-declare -r tg_actvivity_lockscreen="lockscreen"
-declare -r tg_actvivity_overlay="overlay"
-declare -r tg_actvivity_intercept="intercept"
+declare -r tgc_actvivity_tid="tid"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_dialog="dialog"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_canceloutside="canceloutside"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_pip="pip"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_lockscreen="lockscreen"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_overlay="overlay"
+# shellcheck disable=SC2034
+declare -r tgc_actvivity_intercept="intercept"
 
 
-
+# shellcheck disable=SC2034
+declare -r tgc_create_text="text"
+# shellcheck disable=SC2034
+declare -r tgc_create_selectable_text="selectableText"
+# shellcheck disable=SC2034
+declare -r tgc_create_clickable_links="clickableLinks"
+# shellcheck disable=SC2034
+declare -r tgc_create_vertical="vertical"
+# shellcheck disable=SC2034
+declare -r tgc_create_snapping="snapping"
+# shellcheck disable=SC2034
+declare -r tgc_create_fill_viewport="fillviewport"
+# shellcheck disable=SC2034
+declare -r tgc_create_no_bar="nobar"
+# shellcheck disable=SC2034
+declare -r tgc_create_checked="checked"
+# shellcheck disable=SC2034
+declare -r tgc_create_single_line="singleline"
+# shellcheck disable=SC2034
+declare -r tgc_create_line="line"
+# shellcheck disable=SC2034
+declare -r tgc_create_type="type"
+# shellcheck disable=SC2034
+declare -r tgc_create_rows="rows"
+# shellcheck disable=SC2034
+declare -r tgc_create_cols="cols"
+# shellcheck disable=SC2034
+declare -r tgc_create_all_caps="allcaps"
 
 
 
@@ -117,16 +150,31 @@ function tg_str_quote() {
 function tg_json_send() {
   local tosend='{"method": "'"$1"'", "params": {'
   if [ "$2" != "" ]; then
-    local -n params="$2"
-    for key in "${!params[@]}"; do
-      tosend=${tosend}'"'"$key"'":'"${params[$key]},"
-    done
-    tosend=${tosend::-1}"}}"
+    local -n tg_json_send_params="$2"
+    if [ "${#tg_json_send_params[@]}" -ne 0 ]; then
+      for key in "${!params[@]}"; do
+        tosend=${tosend}'"'"$key"'":'"${tg_json_send_params[$key]},"
+      done
+      tosend=${tosend::-1}"}}"
+    else
+      tosend=${tosend}"}}"
+    fi
   else
     tosend=${tosend}"}}"
   fi
+  #echo "$tosend"
   tg_msg_send "$tosend"
 }
+
+function tg__array_copy() {
+  local -n tg__array_copy_source="$1"
+  local -n tg__array_copy_dest="$2"
+  for key in "${!tg__array_copy_source[@]}"; do
+    # shellcheck disable=SC2034
+    tg__array_copy_dest["$key"]="${tg__array_copy_source["$key"]}"
+  done
+}
+
 
 
 
@@ -151,16 +199,17 @@ function tg_global_version() {
 
 
 function tg_activity_new() {
-  local -n params="$1"
-  local -n ret="$2"
+  local -n tg_activity_new_params="$1"
+  local -n tg_activity_new_ret="$2"
   tg_json_send "newActivity" "$1"
   local rec
   rec="$(tg_msg_recv)"
-  if [ "${params[${tg_actvivity_tid}]}" = "" ]; then
-    ret[0]="$(echo "$rec" | jq -r '.[0]')"
-    ret[1]="$(echo "$rec" | jq -r '.[1]')"
+  if [ "${tg_activity_new_params[${tgc_actvivity_tid}]}" = "" ]; then
+    tg_activity_new_ret[0]="$(echo "$rec" | jq -r '.[0]')"
+    tg_activity_new_ret[1]="$(echo "$rec" | jq -r '.[1]')"
   else
-    ret[0]="$(echo "$rec" | jq -r '.')"
+    # shellcheck disable=SC2034
+    tg_activity_new_ret[0]="$(echo "$rec" | jq -r '.')"
   fi
 }
 
@@ -298,185 +347,105 @@ function tg_task_to_front() {
 
 ### VIEW CREATION
 
+function tg__create() {
+  # shellcheck disable=SC2034
+  local -n tg__create_args="$3"
+  declare -A params=([aid]="$2")
+  tg__array_copy tg__create_args params
+  if [ "$4" ]; then
+    params[parent]="$4"
+  fi
+  if [ "$5" ]; then
+    params[visibility]="$5"
+  fi
+  if [ "${params[text]}" ]; then
+    params[text]="$(tg_str_quote "${params[text]}")"
+  fi
+  if [ "${params[type]}" ]; then
+    params[type]="$(tg_str_quote "${params[type]}")"
+  fi
+  tg_json_send "$1" params
+  tg_msg_recv
+}
 
 function tg_create_linear() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createLinearLayout" params
-  tg_msg_recv
+  tg__create "createLinearLayout" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_frame() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createFrameLayout" params
-  tg_msg_recv
+  tg__create "createFrameLayout" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_swipe_refresh() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createSwipeRefreshLayout" params
-  tg_msg_recv
+  tg__create "createSwipeRefreshLayout" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_text() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createTextView" params
-  tg_msg_recv
+  tg__create "createTextView" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_edit() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createEditText" params
-  tg_msg_recv
+  tg__create "createEditText" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_button() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createButton" params
-  tg_msg_recv
+  tg__create "createButton" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_image() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createImageView" params
-  tg_msg_recv
+  tg__create "createImageView" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_space() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createSpace" params
-  tg_msg_recv
+  tg__create "createSpace" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_nested_scroll() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createNestedScrollView" params
-  tg_msg_recv
+  tg__create "createNestedScrollView" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_horizontal_scroll() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createHorizontalScrollView" params
-  tg_msg_recv
+  tg__create "createHorizontalScrollView" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_radio() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createRadioButton" params
-  tg_msg_recv
+  tg__create "createRadioButton" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_radio_group() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createRadioGroup" params
-  tg_msg_recv
+  tg__create "createRadioGroup" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_checkbox() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createCheckbox" params
-  tg_msg_recv
+  tg__create "createCheckbox" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_toggle() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createToggleButton" params
-  tg_msg_recv
+  tg__create "createToggleButton" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_switch() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createSwitch" params
-  tg_msg_recv
+  tg__create "createSwitch" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_spinner() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createSpinner" params
-  tg_msg_recv
+  tg__create "createSpinner" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_progress() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createProgressBar" params
-  tg_msg_recv
+  tg__create "createProgressBar" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_tab() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createTabLayout" params
-  tg_msg_recv
+  tg__create "createTabLayout" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_grid() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createGridLayout" params
-  tg_msg_recv
+  tg__create "createGridLayout" "$1" "$2" "$3" "$4"
 }
 
 function tg_create_web() {
-  declare -A params=([aid]="$1")
-  if [ "$2" ]; then
-    params[parent]="$2"
-  fi
-  tg_json_send "createWebView" params
-  tg_msg_recv
+  tg__create "createWebView" "$1" "$2" "$3" "$4"
 }
 
 
@@ -587,5 +556,5 @@ unset sock_event
 # Run user script if not sourced
 if ! (return 0 2>/dev/null); then
   # shellcheck disable=SC1090
-  . "$1"
+  . "$@"
 fi
