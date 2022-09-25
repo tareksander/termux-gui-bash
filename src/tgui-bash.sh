@@ -153,7 +153,7 @@ function tg_json_send() {
     local -n tg_json_send_params="$2"
     if [ "${#tg_json_send_params[@]}" -ne 0 ]; then
       for key in "${!params[@]}"; do
-        tosend=${tosend}'"'"$key"'":'"${tg_json_send_params[$key]},"
+        tosend="${tosend}"'"'"$key"'":'"${tg_json_send_params[$key]},"
       done
       tosend=${tosend::-1}"}}"
     else
@@ -461,9 +461,209 @@ function tg_create_web() {
 
 ### VIEW MANIPULATION
 
+function tg_view_show_cursor() {
+  declare -A params=([aid]="$1" [id]="$2" [show]="$3")
+  tg_json_send "showCursor" params
+}
 
+function tg_view_linear() {
+  declare -A params=([aid]="$1" [id]="$2")
+  if [ "$3" ]; then
+      params[weight]="$3"
+    fi
+  if [ "$4" ]; then
+    params[position]="$4"
+  fi
+  tg_json_send "setLinearLayoutParams" params
+}
 
+function tg_view_grid() {
+  declare -A params=([aid]="$1" [id]="$2")
+  if [ "$3" ]; then
+    params[row]="$3"
+  fi
+  if [ "$4" ]; then
+    params[col]="$4"
+  fi
+  if [ "$5" ]; then
+    params[rowsize]="$5"
+  fi
+  if [ "$6" ]; then
+    params[colsize]="$6"
+  fi
+  if [ "$7" ]; then
+    params[alignmentrow]="$(tg_str_quote "$7")"
+  fi
+  if [ "$8" ]; then
+    params[alignmentcol]="$(tg_str_quote "$8")"
+  fi
+  tg_json_send "setGridLayoutParams" params
+}
 
+function tg_view_location() {
+  declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
+  if [ "$5" ]; then
+    params[dp]="$5"
+    fi
+  if [ "$6" ]; then
+    params[top]="$6"
+  fi
+  tg_json_send "setViewLocation" params
+}
+
+function tg_view_vis() {
+  declare -A params=([aid]="$1" [id]="$2" [vis]="$3")
+  tg_json_send "setVisibility" params
+}
+
+function tg_view_width() {
+  declare -A params=([aid]="$1" [id]="$2" [width]="$3")
+  if [ "$4" ]; then
+    params[px]="$4"
+  fi
+  tg_json_send "setWidth" params
+}
+
+function tg_view_height() {
+  declare -A params=([aid]="$1" [id]="$2" [height]="$3")
+  if [ "$4" ]; then
+    params[px]="$4"
+  fi
+  tg_json_send "setHeight" params
+}
+
+function tg_view_dimensions() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "getDimensions" params
+  tg_msg_recv
+}
+
+function tg_view_delete() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "deleteView" params
+}
+
+function tg_view_delete_children() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "deleteChildren" params
+}
+
+function tg_view_margin() {
+  declare -A params=([aid]="$1" [id]="$2" [margin]="$3")
+  if [ "$4" ]; then
+    params[dir]="$(tg_str_quote "$4")"
+  fi
+  tg_json_send "setMargin" params
+}
+
+function tg_view_padding() {
+  declare -A params=([aid]="$1" [id]="$2" [padding]="$3")
+  if [ "$4" ]; then
+    params[dir]="$(tg_str_quote "$4")"
+  fi
+  tg_json_send "setPadding" params
+}
+
+function tg_view_bg_color() {
+  declare -A params=([aid]="$1" [id]="$2" [color]="$3")
+  tg_json_send "setBackgroundColor" params
+}
+
+function tg_view_text_color() {
+  declare -A params=([aid]="$1" [id]="$2" [color]="$3")
+  tg_json_send "setTextColor" params
+}
+
+function tg_view_progress() {
+  declare -A params=([aid]="$1" [id]="$2" [progress]="$3")
+  tg_json_send "setProgress" params
+}
+
+function tg_view_refreshing() {
+  declare -A params=([aid]="$1" [id]="$2" [refresh]="$3")
+  tg_json_send "setRefreshing" params
+}
+
+function tg_view_text() {
+  declare -A params=([aid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
+  tg_json_send "setText" params
+}
+
+function tg_view_gravity() {
+  declare -A params=([aid]="$1" [id]="$2" [horizontal]="$3" [vertical]="$4")
+  tg_json_send "setGravity" params
+}
+
+function tg_view_text_size() {
+  declare -A params=([aid]="$1" [id]="$2" [size]="$3")
+  tg_json_send "setTextSize" params
+}
+
+function tg_view_get_text() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "getText" params
+  tg_msg_recv | jq -r '.'
+}
+
+function tg_view_checked() {
+  declare -A params=([aid]="$1" [id]="$2" [checked]="$3")
+  tg_json_send "setChecked" params
+}
+
+function tg_view_request_focus() {
+  declare -A params=([aid]="$1" [id]="$2" [forcesoft]="$3")
+  tg_json_send "requestFocus" params
+}
+
+function tg_view_get_scroll() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "getScrollPosition" params
+  tg_msg_recv
+}
+
+function tg_view_set_scroll() {
+  declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
+  if [ "$5" ]; then
+    params[soft]="$5"
+  fi
+  tg_json_send "setScrollPosition" params
+}
+
+function tg_view_list() {
+  declare -A params=([aid]="$1" [id]="$2")
+  local -n tg_view_list_list="$3"
+  local array="["
+  for key in "${!tg_view_list_list[@]}"; do
+    array="${array}$(tg_str_quote "${tg_view_list_list["$key"]}"),"
+  done
+  if [ "${!tg_view_list_list[@]}" ]; then
+    array="${array::-1}]"
+  else
+    array="$array]"
+  fi
+  params[list]="$array"
+  tg_json_send "setList" params
+}
+
+function tg_view_image() {
+  declare -A params=([aid]="$1" [id]="$2" [img]='"'"$3"'"')
+  tg_json_send "setImage" params
+}
+
+function tg_view_select_tab() {
+  declare -A params=([aid]="$1" [id]="$2" [tab]="$3")
+  tg_json_send "selectTab" params
+}
+
+function tg_view_select_item() {
+  declare -A params=([aid]="$1" [id]="$2" [item]="$3")
+  tg_json_send "selectItem" params
+}
+
+function tg_view_clickable() {
+  declare -A params=([aid]="$1" [id]="$2" [clickable]="$3")
+  tg_json_send "setClickable" params
+}
 
 
 
@@ -503,8 +703,45 @@ function tg_create_web() {
 
 ### WEBVIEW
 
+function tg_web_allow_js() {
+  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowJavascript" params
+}
 
+function tg_web_allow_content() {
+  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowContentURI" params
+}
 
+function tg_web_set_data() {
+  declare -A params=([aid]="$1" [id]="$2" [doc]="$(tg_str_quote "$3")")
+  tg_json_send "setData" params
+}
+
+function tg_web_load_uri() {
+  declare -A params=([aid]="$1" [id]="$2" [uri]="$(tg_str_quote "$3")")
+  tg_json_send "loadURI" params
+}
+
+function tg_web_allow_navigation() {
+  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowNavigation" params
+}
+
+function tg_web_back() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "goBack" params
+}
+
+function tg_web_forward() {
+  declare -A params=([aid]="$1" [id]="$2")
+  tg_json_send "goForward" params
+}
+
+function tg_web_eval_js() {
+  declare -A params=([aid]="$1" [id]="$2" [code]="$(tg_str_quote "$3")")
+  tg_json_send "evaluateJS" params
+}
 
 
 
