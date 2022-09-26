@@ -680,20 +680,181 @@ function tg_view_clickable() {
 
 ### REMOTE LAYOUTS, WIDGETS & NOTIFICATIONS
 
+function tg_remote_create_layout() {
+  declare -A params=()
+  tg_json_send "createRemoteLayout" params
+  tg_msg_recv
+}
 
+function tg_remote_delete_layout() {
+  declare -A params=([rid]="$1")
+  tg_json_send "deleteRemoteLayout" params
+}
 
+function tg_remote_create_frame() {
+  declare -A params=([rid]="$1" [parent]="$2")
+  tg_json_send "addRemoteFrameLayout" params
+  tg_msg_recv
+}
 
+function tg_remote_create_text() {
+  declare -A params=([rid]="$1" [parent]="$2")
+  tg_json_send "addRemoteTextView" params
+  tg_msg_recv
+}
 
+function tg_remote_create_button() {
+  declare -A params=([rid]="$1" [parent]="$2")
+  tg_json_send "addRemoteButton" params
+  tg_msg_recv
+}
 
+function tg_remote_create_image() {
+  declare -A params=([rid]="$1" [parent]="$2")
+  tg_json_send "addRemoteImageView" params
+  tg_msg_recv
+}
 
+function tg_remote_create_progress() {
+  declare -A params=([rid]="$1" [parent]="$2")
+  tg_json_send "addRemoteProgressBar" params
+  tg_msg_recv
+}
 
+function tg_remote_bg_color() {
+  declare -A params=([rid]="$1" [id]="$2" [color]="$3")
+  tg_json_send "setRemoteBackgroundColor" params
+}
 
+function tg_remote_progress() {
+  declare -A params=([rid]="$1" [id]="$2" [progress]="$3" [max]=100)
+  tg_json_send "setRemoteProgressBar" params
+}
 
+function tg_remote_text() {
+  declare -A params=([rid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
+  tg_json_send "setRemoteText" params
+}
 
+function tg_remote_text_size() {
+  declare -A params=([rid]="$1" [id]="$2" [size]="$3")
+  if [ "$4" ]; then
+    params[px]="$4"
+  fi
+  tg_json_send "setRemoteTextSize" params
+}
 
+function tg_remote_text_color() {
+  declare -A params=([rid]="$1" [id]="$2" [color]="$3")
+  tg_json_send "setRemoteTextColor" params
+}
+
+function tg_remote_vis() {
+  declare -A params=([rid]="$1" [id]="$2" [vis]="$3")
+  tg_json_send "setRemoteVisibility" params
+}
+
+function tg_remote_padding() {
+  declare -A params=([rid]="$1" [id]="$2")
+  if [ "$3" ]; then
+    params[top]="$3"
+  fi
+  if [ "$4" ]; then
+    params[right]="$4"
+  fi
+  if [ "$5" ]; then
+    params[bottom]="$5"
+  fi
+  if [ "$6" ]; then
+    params[left]="$6"
+  fi
+  tg_json_send "setRemotePadding" params
+}
+
+function tg_remote_image() {
+  declare -A params=([rid]="$1" [id]="$2" [img]="$(tg_str_quote "$3")")
+  tg_json_send "setRemoteImage" params
+}
+
+function tg_widget_layout() {
+  declare -A params=([rid]="$1" [wid]="$2")
+  tg_json_send "setWidgetLayout" params
+}
+
+function tg_not_create_channel() {
+  declare -A params=([id]="$(tg_str_quote "$1")" [importance]="$2" [name]="$(tg_str_quote "$3")")
+  tg_json_send "createNotificationChannel" params
+}
+
+function tg_not_create() {
+  declare -A params=([channel]="$(tg_str_quote "$1")" [importance]="$2")
+  # shellcheck disable=SC2034
+  local -n tg_not_create_args="$3"
+  tg__array_copy tg_not_create_args params
+  if [ "${params[title]}" ]; then
+    params[title]="$(tg_str_quote "${params[title]}")"
+  fi
+  if [ "${params[content]}" ]; then
+    params[content]="$(tg_str_quote "${params[content]}")"
+  fi
+  if [ "${params[largeImage]}" ]; then
+    params[largeImage]="$(tg_str_quote "${params[largeImage]}")"
+  fi
+  if [ "${params[largeText]}" ]; then
+    params[largeText]="$(tg_str_quote "${params[largeText]}")"
+  fi
+  if [ "${params[icon]}" ]; then
+    params[icon]="$(tg_str_quote "${params[icon]}")"
+  fi
+  if [ "$3" ]; then
+    local -n tg_not_create_actions="$3"
+    local array="["
+    for key in "${!tg_not_create_actions[@]}"; do
+      array="${array}$(tg_str_quote "${tg_not_create_actions["$key"]}"),"
+    done
+    if [ "${!tg_not_create_actions[@]}" ]; then
+      array="${array::-1}]"
+    else
+      array="$array]"
+    fi
+    params[actions]="$array"
+  fi
+  tg_json_send "createNotification" params
+}
+
+function tg_not_cancel() {
+  declare -A params=([id]="$1")
+  tg_json_send "cancelNotification" params
+}
 
 ### EVENT CONTROL
 
+
+
+function tg_event_send_click() {
+  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendClickEvent" params
+}
+
+function tg_event_send_long_click() {
+  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendLongClickEvent" params
+}
+
+function tg_event_send_focus() {
+  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendFocusChangeEvent" params
+}
+
+function tg_event_send_touch() {
+  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendTouchEvent" params
+}
+
+function tg_event_send_text() {
+  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendTextEvent" params
+}
 
 
 
