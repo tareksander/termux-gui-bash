@@ -1,5 +1,7 @@
 #!@TERMUX_PREFIX@/bin/bash
 
+# unset variables from the extract script
+unset archivestart
 
 if [ $# -lt 1 ] && ! (return 0 2>/dev/null); then
   echo 'Usage: tgui-bash path ...' >&2
@@ -10,6 +12,98 @@ if [ $# -ne 0 ] && (return 0 2>/dev/null); then
   echo 'When sourced, tgui-bash needs no arguments' >&2
   exit 1
 fi
+
+if [ "$1" = "-h" ]; then
+  if [ "$2" = 0 ]; then
+    docpath="@TERMUX_PREFIX@/share/tgui-bash/manual"
+  fi
+  if [ "$2" = 1 ]; then
+    docpath="@TERMUX_PREFIX@/share/tgui-bash/tutorial"
+  fi
+  if [ -z "$docpath" ]; then
+    while true; do
+      echo "Showing help. Do you want:"
+      echo "0: The manual"
+      echo "1: The tutorial"
+      read -r resp
+      if [ "$resp" == 0 ]; then
+        docpath="@TERMUX_PREFIX@/share/tgui-bash/manual"
+        break
+      fi
+      if [ "$resp" == 1 ]; then
+        docpath="@TERMUX_PREFIX@/share/tgui-bash/tutorial"
+        break
+      fi
+      echo
+    done
+  fi
+  if [ "$3" = 0 ]; then
+    docpathext="-dark.html.gz"
+  fi
+  if [ "$3" = 1 ]; then
+    docpathext="-light.html.gz"
+  fi
+  if [ -z "$docpathext" ]; then
+    while true; do
+      echo "Light or dark theme:"
+      echo "0: Dark"
+      echo "1: Light"
+      read -r resp
+      if [ "$resp" == 0 ]; then
+        docpathext="-dark.html.gz"
+        break
+      fi
+      if [ "$resp" == 1 ]; then
+        docpathext="-light.html.gz"
+        break
+      fi
+      echo
+    done
+  fi
+  if [ "$4" = 0 ]; then
+    @TERMUX_PREFIX@/share/tgui-bash/docviewer.sh "$docpath$docpathext"
+    exit 0
+  fi
+  if [ "$4" = 1 ]; then
+    browser="com.android.htmlviewer/.HTMLViewerActivity"
+  fi
+  if [ "$4" = 2 ]; then
+    browser="com.android.chrome/com.google.android.apps.chrome.Main"
+  fi
+  if [ "$4" = 3 ]; then
+    browser="org.mozilla.firefox/.org.mozilla.firefox.App"
+  fi
+  if [ -z "$browser" ]; then
+    while true; do
+      echo "What browser do you want:"
+      echo "0: The Termux:GUI WebView"
+      echo "1: Android integrated HTML Viewer"
+      echo "2: Chrome"
+      echo "3: Firefox"
+      read -r resp
+      if [ "$resp" == 0 ]; then
+        @TERMUX_PREFIX@/share/tgui-bash/manual.html "$docpath$docpathext"
+        exit 0
+      fi
+      if [ "$resp" == 1 ]; then
+        browser="com.android.htmlviewer/.HTMLViewerActivity"
+        break
+      fi
+      if [ "$resp" == 2 ]; then
+        browser="com.android.chrome/com.google.android.apps.chrome.Main"
+        break
+      fi
+      if [ "$resp" == 3 ]; then
+        browser="org.mozilla.firefox/.org.mozilla.firefox.App"
+        break
+      fi
+      echo
+    done
+  fi
+  am start -d "data:text/html;base64,$(gunzip -c "$docpath$docpathext" | base64 -w 0)" "$browser" >/dev/null 2>&1
+  exit 0
+fi
+
 
 # Check if jq is installed
 if ! command -v jq &>/dev/null; then
@@ -76,8 +170,146 @@ declare -r tgc_create_cols="cols"
 declare -r tgc_create_all_caps="allcaps"
 
 
+# shellcheck disable=SC2034
+declare -r tgc_vis_gone="0"
+# shellcheck disable=SC2034
+declare -r tgc_vis_visible="2"
+# shellcheck disable=SC2034
+declare -r tgc_vis_hidden="1"
+
+# shellcheck disable=SC2034
+declare -r tgc_view_wrap_content='"WRAP_CONTENT"'
+# shellcheck disable=SC2034
+declare -r tgc_view_match_parent='"MATCH_PARENT"'
+
+# shellcheck disable=SC2034
+declare -r tgc_grid_top="top"
+# shellcheck disable=SC2034
+declare -r tgc_grid_bottom="bottom"
+# shellcheck disable=SC2034
+declare -r tgc_grid_left="left"
+# shellcheck disable=SC2034
+declare -r tgc_grid_right="right"
+# shellcheck disable=SC2034
+declare -r tgc_grid_center="center"
+# shellcheck disable=SC2034
+declare -r tgc_grid_baseline="baseline"
+# shellcheck disable=SC2034
+declare -r tgc_grid_fill="fill"
+
+# shellcheck disable=SC2034
+declare -r tgc_dir_top="top"
+# shellcheck disable=SC2034
+declare -r tgc_dir_bottom="bottom"
+# shellcheck disable=SC2034
+declare -r tgc_dir_left="left"
+# shellcheck disable=SC2034
+declare -r tgc_dir_right="right"
+
+# shellcheck disable=SC2034
+declare -r tgc_grav_top_left="0"
+# shellcheck disable=SC2034
+declare -r tgc_grav_center="1"
+# shellcheck disable=SC2034
+declare -r tgc_grav_bottom_right="2"
 
 
+# shellcheck disable=SC2034
+declare -r tgc_not_id="id"
+# shellcheck disable=SC2034
+declare -r tgc_not_ongoing="ongoing"
+# shellcheck disable=SC2034
+declare -r tgc_not_layout="layout"
+# shellcheck disable=SC2034
+declare -r tgc_not_expanded_layout="expandedLayout"
+# shellcheck disable=SC2034
+declare -r tgc_not_hud_layout="hudLayout"
+# shellcheck disable=SC2034
+declare -r tgc_not_title="title"
+# shellcheck disable=SC2034
+declare -r tgc_not_content="content"
+# shellcheck disable=SC2034
+declare -r tgc_not_large_image="largeImage"
+# shellcheck disable=SC2034
+declare -r tgc_not_large_text="largeText"
+# shellcheck disable=SC2034
+declare -r tgc_not_large_image_thumbnail="largeImageAsThumbnail"
+# shellcheck disable=SC2034
+declare -r tgc_not_icon="icon"
+# shellcheck disable=SC2034
+declare -r tgc_not_alert_once="alertOnce"
+# shellcheck disable=SC2034
+declare -r tgc_not_show_timestamp="showTimestamp"
+# shellcheck disable=SC2034
+declare -r tgc_not_timestamp="timestamp"
+# shellcheck disable=SC2034
+declare -r tgc_not_actions="actions"
+
+
+# shellcheck disable=SC2034
+declare -r tgc_ev_click="click"
+# shellcheck disable=SC2034
+declare -r tgc_ev_long_click="longClick"
+# shellcheck disable=SC2034
+declare -r tgc_ev_focus_change="focusChange"
+# shellcheck disable=SC2034
+declare -r tgc_ev_refresh="refresh"
+# shellcheck disable=SC2034
+declare -r tgc_ev_selected="selected"
+# shellcheck disable=SC2034
+declare -r tgc_ev_item_selected="itemselected"
+# shellcheck disable=SC2034
+declare -r tgc_ev_text="text"
+# shellcheck disable=SC2034
+declare -r tgc_ev_back="back"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_navigation="webviewNavigation"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_http_error="webviewHTTPError"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_error="webviewError"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_destroyed="webviewDestroyed"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_progress="webviewProgress"
+# shellcheck disable=SC2034
+declare -r tgc_ev_webview_console_message="webviewConsoleMessage"
+# shellcheck disable=SC2034
+declare -r tgc_ev_create="create"
+# shellcheck disable=SC2034
+declare -r tgc_ev_start="start"
+# shellcheck disable=SC2034
+declare -r tgc_ev_resume="resume"
+# shellcheck disable=SC2034
+declare -r tgc_ev_pause="pause"
+# shellcheck disable=SC2034
+declare -r tgc_ev_stop="stop"
+# shellcheck disable=SC2034
+declare -r tgc_ev_destroy="destroy"
+# shellcheck disable=SC2034
+declare -r tgc_ev_config="config"
+# shellcheck disable=SC2034
+declare -r tgc_ev_user_leave_hint="UserLeaveHint"
+# shellcheck disable=SC2034
+declare -r tgc_ev_pip_changed="pipchanged"
+# shellcheck disable=SC2034
+declare -r tgc_ev_airplane="airplane"
+# shellcheck disable=SC2034
+declare -r tgc_ev_locale="locale"
+# shellcheck disable=SC2034
+declare -r tgc_ev_screen_on="screen_on"
+# shellcheck disable=SC2034
+declare -r tgc_ev_screen_off="screen_off"
+# shellcheck disable=SC2034
+declare -r tgc_ev_timezone="timezone"
+# shellcheck disable=SC2034
+declare -r tgc_ev_notification="notification"
+# shellcheck disable=SC2034
+declare -r tgc_ev_notification_dismissed="notificationDismissed"
+# shellcheck disable=SC2034
+declare -r tgc_ev_notification_action="notificationaction"
+# shellcheck disable=SC2034
+declare -r tgc_ev_remote_click="remoteclick"
 
 
 ### MESSAGE FUNCTIONS
@@ -692,31 +924,46 @@ function tg_remote_delete_layout() {
 }
 
 function tg_remote_create_frame() {
-  declare -A params=([rid]="$1" [parent]="$2")
+  declare -A params=([rid]="$1")
+  if [ "$2" ]; then
+    params[parent]="$2"
+  fi
   tg_json_send "addRemoteFrameLayout" params
   tg_msg_recv
 }
 
 function tg_remote_create_text() {
-  declare -A params=([rid]="$1" [parent]="$2")
+  declare -A params=([rid]="$1")
+  if [ "$2" ]; then
+    params[parent]="$2"
+  fi
   tg_json_send "addRemoteTextView" params
   tg_msg_recv
 }
 
 function tg_remote_create_button() {
-  declare -A params=([rid]="$1" [parent]="$2")
+  declare -A params=([rid]="$1")
+  if [ "$2" ]; then
+    params[parent]="$2"
+  fi
   tg_json_send "addRemoteButton" params
   tg_msg_recv
 }
 
 function tg_remote_create_image() {
-  declare -A params=([rid]="$1" [parent]="$2")
+  declare -A params=([rid]="$1")
+  if [ "$2" ]; then
+    params[parent]="$2"
+  fi
   tg_json_send "addRemoteImageView" params
   tg_msg_recv
 }
 
 function tg_remote_create_progress() {
-  declare -A params=([rid]="$1" [parent]="$2")
+  declare -A params=([rid]="$1")
+  if [ "$2" ]; then
+    params[parent]="$2"
+  fi
   tg_json_send "addRemoteProgressBar" params
   tg_msg_recv
 }
@@ -906,7 +1153,38 @@ function tg_web_eval_js() {
 
 
 
+### EVENT HANDLING
 
+
+function tg_event_type() {
+  echo "$1" | jq -r '.type'
+}
+
+function tg_event_value() {
+  echo "$1" | jq -r '.value'
+}
+
+function tg_event_aid() {
+  echo "$1" | jq -r '.value.aid'
+}
+
+function tg_event_id() {
+  echo "$1" | jq -r '.value.id'
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+### SETUP
 
 
 

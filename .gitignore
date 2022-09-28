@@ -16,4 +16,3 @@ _deps
 /.vscode
 /termux-gui-bash.tar.gz
 /push.sh
-/test.sh

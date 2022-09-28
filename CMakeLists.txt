@@ -13,23 +13,27 @@ find_package(Threads REQUIRED)
 set(version 1.0)
 
 
-#add_custom_command(
-#    OUTPUT "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1.gz"
-#    COMMAND gzip ARGS -f "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1"
-#    MAIN_DEPENDENCY "${CMAKE_CURRENT_SOURCE_DIR}/tgui-bash.1"
-#    VERBATIM)
-
-
-#add_custom_target(gendoc ALL DEPENDS "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1.gz")
 
 add_executable(termux-gui-bash-helper src/helper.c)
 
 target_link_libraries(termux-gui-bash-helper Threads::Threads)
 
 
-configure_file(src/tgui-bash.sh tgui-bash @ONLY)
+configure_file(src/tgui-bash.sh tgui-bash.sh @ONLY)
+configure_file(src/unzip.sh tgui-bash @ONLY)
+configure_file(src/docviewer.sh docviewer.sh @ONLY)
 
+execute_process(
+    COMMAND bash -c "gzip -c -k \"${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.sh\" >> \"${CMAKE_CURRENT_BINARY_DIR}/tgui-bash\""
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}")
 
 install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash" TYPE BIN)
+install(PROGRAMS "${CMAKE_CURRENT_BINARY_DIR}/docviewer.sh" DESTINATION "${CMAKE_INSTALL_PREFIX}/share/tgui-bash")
+install(FILES
+    doc_html/tutorial-light.html.gz
+    doc_html/tutorial-dark.html.gz
+    doc_html/manual-light.html.gz
+    doc_html/manual-dark.html.gz
+    DESTINATION "${CMAKE_INSTALL_PREFIX}/share/tgui-bash")
 install(TARGETS termux-gui-bash-helper RUNTIME DESTINATION "${CMAKE_INSTALL_PREFIX}/libexec")
-#install(FILES "${CMAKE_CURRENT_BINARY_DIR}/tgui-bash.1.gz" DESTINATION "${CMAKE_INSTALL_PREFIX}/man/man1/tgui-bash.1.gz")
+
