@@ -456,7 +456,7 @@ function tg_activity_to_back() {
 }
 
 function tg_activity_theme() {
-  declare -A params=([aid]="$1" [statusBarColor]="$2" [colorPrimary]="$3" [windowBackground]="$4" [textColor]="$5" [colorAccent]="$6")
+  declare -A params=([aid]="$1" [statusBarColor]="$(tg__hex_to_dec "$2")" [colorPrimary]="$(tg__hex_to_dec "$3")" [windowBackground]="$(tg__hex_to_dec "$4")" [textColor]="$(tg__hex_to_dec "$5")" [colorAccent]="$(tg__hex_to_dec "$6")")
   tg_json_send "setTheme" params
 }
 
@@ -797,12 +797,12 @@ function tg_view_padding() {
 }
 
 function tg_view_bg_color() {
-  declare -A params=([aid]="$1" [id]="$2" [color]="$3")
+  declare -A params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
   tg_json_send "setBackgroundColor" params
 }
 
 function tg_view_text_color() {
-  declare -A params=([aid]="$1" [id]="$2" [color]="$3")
+  declare -A params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
   tg_json_send "setTextColor" params
 }
 
@@ -969,7 +969,7 @@ function tg_remote_create_progress() {
 }
 
 function tg_remote_bg_color() {
-  declare -A params=([rid]="$1" [id]="$2" [color]="$3")
+  declare -A params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
   tg_json_send "setRemoteBackgroundColor" params
 }
 
@@ -992,7 +992,7 @@ function tg_remote_text_size() {
 }
 
 function tg_remote_text_color() {
-  declare -A params=([rid]="$1" [id]="$2" [color]="$3")
+  declare -A params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
   tg_json_send "setRemoteTextColor" params
 }
 
