@@ -12,6 +12,7 @@ Sets up a connection to the Termux:GUI plugin through a small C helper, defines 
 Can be used in a shebang (`#!/bin/tgui-bash`) or sourced.
   
 Using `set -eo pipefail` is advised to make your script exit when the connection to the plugin gets broken.
+For development, you should use `set -u` to make sure you spelled the constant names correctly.
 
 This library also uses the EXIT trap handler, so make sure to just add to it, but not overwrite it.
 

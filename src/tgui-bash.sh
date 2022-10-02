@@ -436,7 +436,7 @@ function tg_activity_new() {
   tg_json_send "newActivity" "$1"
   local rec
   rec="$(tg_msg_recv)"
-  if [ "${tg_activity_new_params[${tgc_actvivity_tid}]}" = "" ]; then
+  if [ ! -v "tg_activity_new_params[${tgc_actvivity_tid}]" ]; then
     tg_activity_new_ret[0]="$(echo "$rec" | jq -r '.[0]')"
     tg_activity_new_ret[1]="$(echo "$rec" | jq -r '.[1]')"
   else
@@ -584,16 +584,16 @@ function tg__create() {
   local -n tg__create_args="$3"
   declare -A params=([aid]="$2")
   tg__array_copy tg__create_args params
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[parent]="$4"
   fi
-  if [ "$5" ]; then
+  if [ -v "5" ]; then
     params[visibility]="$5"
   fi
-  if [ "${params[text]}" ]; then
+  if [ -v "params[text]" ]; then
     params[text]="$(tg_str_quote "${params[text]}")"
   fi
-  if [ "${params[type]}" ]; then
+  if [ -v "params[type]" ]; then
     params[type]="$(tg_str_quote "${params[type]}")"
   fi
   tg_json_send "$1" params
@@ -601,83 +601,83 @@ function tg__create() {
 }
 
 function tg_create_linear() {
-  tg__create "createLinearLayout" "$1" "$2" "$3" "$4"
+  tg__create "createLinearLayout" "$@"
 }
 
 function tg_create_frame() {
-  tg__create "createFrameLayout" "$1" "$2" "$3" "$4"
+  tg__create "createFrameLayout" "$@"
 }
 
 function tg_create_swipe_refresh() {
-  tg__create "createSwipeRefreshLayout" "$1" "$2" "$3" "$4"
+  tg__create "createSwipeRefreshLayout" "$@"
 }
 
 function tg_create_text() {
-  tg__create "createTextView" "$1" "$2" "$3" "$4"
+  tg__create "createTextView" "$@"
 }
 
 function tg_create_edit() {
-  tg__create "createEditText" "$1" "$2" "$3" "$4"
+  tg__create "createEditText" "$@"
 }
 
 function tg_create_button() {
-  tg__create "createButton" "$1" "$2" "$3" "$4"
+  tg__create "createButton" "$@"
 }
 
 function tg_create_image() {
-  tg__create "createImageView" "$1" "$2" "$3" "$4"
+  tg__create "createImageView" "$@"
 }
 
 function tg_create_space() {
-  tg__create "createSpace" "$1" "$2" "$3" "$4"
+  tg__create "createSpace" "$@"
 }
 
 function tg_create_nested_scroll() {
-  tg__create "createNestedScrollView" "$1" "$2" "$3" "$4"
+  tg__create "createNestedScrollView" "$@"
 }
 
 function tg_create_horizontal_scroll() {
-  tg__create "createHorizontalScrollView" "$1" "$2" "$3" "$4"
+  tg__create "createHorizontalScrollView" "$@"
 }
 
 function tg_create_radio() {
-  tg__create "createRadioButton" "$1" "$2" "$3" "$4"
+  tg__create "createRadioButton" "$@"
 }
 
 function tg_create_radio_group() {
-  tg__create "createRadioGroup" "$1" "$2" "$3" "$4"
+  tg__create "createRadioGroup" "$@"
 }
 
 function tg_create_checkbox() {
-  tg__create "createCheckbox" "$1" "$2" "$3" "$4"
+  tg__create "createCheckbox" "$@"
 }
 
 function tg_create_toggle() {
-  tg__create "createToggleButton" "$1" "$2" "$3" "$4"
+  tg__create "createToggleButton" "$@"
 }
 
 function tg_create_switch() {
-  tg__create "createSwitch" "$1" "$2" "$3" "$4"
+  tg__create "createSwitch" "$@"
 }
 
 function tg_create_spinner() {
-  tg__create "createSpinner" "$1" "$2" "$3" "$4"
+  tg__create "createSpinner" "$@"
 }
 
 function tg_create_progress() {
-  tg__create "createProgressBar" "$1" "$2" "$3" "$4"
+  tg__create "createProgressBar" "$@"
 }
 
 function tg_create_tab() {
-  tg__create "createTabLayout" "$1" "$2" "$3" "$4"
+  tg__create "createTabLayout" "$@"
 }
 
 function tg_create_grid() {
-  tg__create "createGridLayout" "$1" "$2" "$3" "$4"
+  tg__create "createGridLayout" "$@"
 }
 
 function tg_create_web() {
-  tg__create "createWebView" "$1" "$2" "$3" "$4"
+  tg__create "createWebView" "$@"
 }
 
 
@@ -700,10 +700,10 @@ function tg_view_show_cursor() {
 
 function tg_view_linear() {
   declare -A params=([aid]="$1" [id]="$2")
-  if [ "$3" ]; then
+  if [ -v "3" ]; then
       params[weight]="$3"
     fi
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[position]="$4"
   fi
   tg_json_send "setLinearLayoutParams" params
@@ -711,22 +711,22 @@ function tg_view_linear() {
 
 function tg_view_grid() {
   declare -A params=([aid]="$1" [id]="$2")
-  if [ "$3" ]; then
+  if [ -v "3" ]; then
     params[row]="$3"
   fi
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[col]="$4"
   fi
-  if [ "$5" ]; then
+  if [ -v "5" ]; then
     params[rowsize]="$5"
   fi
-  if [ "$6" ]; then
+  if [ -v "6" ]; then
     params[colsize]="$6"
   fi
-  if [ "$7" ]; then
+  if [ -v "7" ]; then
     params[alignmentrow]="$(tg_str_quote "$7")"
   fi
-  if [ "$8" ]; then
+  if [ -v "8" ]; then
     params[alignmentcol]="$(tg_str_quote "$8")"
   fi
   tg_json_send "setGridLayoutParams" params
@@ -734,10 +734,10 @@ function tg_view_grid() {
 
 function tg_view_location() {
   declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
-  if [ "$5" ]; then
+  if [ -v "5" ]; then
     params[dp]="$5"
     fi
-  if [ "$6" ]; then
+  if [ -v "6" ]; then
     params[top]="$6"
   fi
   tg_json_send "setViewLocation" params
@@ -750,7 +750,7 @@ function tg_view_vis() {
 
 function tg_view_width() {
   declare -A params=([aid]="$1" [id]="$2" [width]="$3")
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[px]="$4"
   fi
   tg_json_send "setWidth" params
@@ -758,7 +758,7 @@ function tg_view_width() {
 
 function tg_view_height() {
   declare -A params=([aid]="$1" [id]="$2" [height]="$3")
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[px]="$4"
   fi
   tg_json_send "setHeight" params
@@ -782,7 +782,7 @@ function tg_view_delete_children() {
 
 function tg_view_margin() {
   declare -A params=([aid]="$1" [id]="$2" [margin]="$3")
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[dir]="$(tg_str_quote "$4")"
   fi
   tg_json_send "setMargin" params
@@ -790,7 +790,7 @@ function tg_view_margin() {
 
 function tg_view_padding() {
   declare -A params=([aid]="$1" [id]="$2" [padding]="$3")
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[dir]="$(tg_str_quote "$4")"
   fi
   tg_json_send "setPadding" params
@@ -855,7 +855,7 @@ function tg_view_get_scroll() {
 
 function tg_view_set_scroll() {
   declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
-  if [ "$5" ]; then
+  if [ -v "5" ]; then
     params[soft]="$5"
   fi
   tg_json_send "setScrollPosition" params
@@ -925,7 +925,7 @@ function tg_remote_delete_layout() {
 
 function tg_remote_create_frame() {
   declare -A params=([rid]="$1")
-  if [ "$2" ]; then
+  if [ -v "2" ]; then
     params[parent]="$2"
   fi
   tg_json_send "addRemoteFrameLayout" params
@@ -934,7 +934,7 @@ function tg_remote_create_frame() {
 
 function tg_remote_create_text() {
   declare -A params=([rid]="$1")
-  if [ "$2" ]; then
+  if [ -v "2" ]; then
     params[parent]="$2"
   fi
   tg_json_send "addRemoteTextView" params
@@ -943,7 +943,7 @@ function tg_remote_create_text() {
 
 function tg_remote_create_button() {
   declare -A params=([rid]="$1")
-  if [ "$2" ]; then
+  if [ -v "2" ]; then
     params[parent]="$2"
   fi
   tg_json_send "addRemoteButton" params
@@ -952,7 +952,7 @@ function tg_remote_create_button() {
 
 function tg_remote_create_image() {
   declare -A params=([rid]="$1")
-  if [ "$2" ]; then
+  if [ -v "2" ]; then
     params[parent]="$2"
   fi
   tg_json_send "addRemoteImageView" params
@@ -961,7 +961,7 @@ function tg_remote_create_image() {
 
 function tg_remote_create_progress() {
   declare -A params=([rid]="$1")
-  if [ "$2" ]; then
+  if [ -v "2" ]; then
     params[parent]="$2"
   fi
   tg_json_send "addRemoteProgressBar" params
@@ -985,7 +985,7 @@ function tg_remote_text() {
 
 function tg_remote_text_size() {
   declare -A params=([rid]="$1" [id]="$2" [size]="$3")
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[px]="$4"
   fi
   tg_json_send "setRemoteTextSize" params
@@ -1003,16 +1003,16 @@ function tg_remote_vis() {
 
 function tg_remote_padding() {
   declare -A params=([rid]="$1" [id]="$2")
-  if [ "$3" ]; then
+  if [ -v "3" ]; then
     params[top]="$3"
   fi
-  if [ "$4" ]; then
+  if [ -v "4" ]; then
     params[right]="$4"
   fi
-  if [ "$5" ]; then
+  if [ -v "5" ]; then
     params[bottom]="$5"
   fi
-  if [ "$6" ]; then
+  if [ -v "6" ]; then
     params[left]="$6"
   fi
   tg_json_send "setRemotePadding" params
@@ -1038,22 +1038,22 @@ function tg_not_create() {
   # shellcheck disable=SC2034
   local -n tg_not_create_args="$3"
   tg__array_copy tg_not_create_args params
-  if [ "${params[title]}" ]; then
+  if [ -v "params[title]" ]; then
     params[title]="$(tg_str_quote "${params[title]}")"
   fi
-  if [ "${params[content]}" ]; then
+  if [ -v "params[content]" ]; then
     params[content]="$(tg_str_quote "${params[content]}")"
   fi
-  if [ "${params[largeImage]}" ]; then
+  if [ -v "params[largeImage]" ]; then
     params[largeImage]="$(tg_str_quote "${params[largeImage]}")"
   fi
-  if [ "${params[largeText]}" ]; then
+  if [ -v "params[largeText]" ]; then
     params[largeText]="$(tg_str_quote "${params[largeText]}")"
   fi
-  if [ "${params[icon]}" ]; then
+  if [ -v "params[icon]" ]; then
     params[icon]="$(tg_str_quote "${params[icon]}")"
   fi
-  if [ "$3" ]; then
+  if [ -v "3" ]; then
     local -n tg_not_create_actions="$3"
     local array="["
     for key in "${!tg_not_create_actions[@]}"; do
@@ -1196,7 +1196,7 @@ sock_main="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 60)"
 sock_event="$(tr -dc A-Za-z0-9 </dev/urandom | head -c 60)"
 
 # shellcheck disable=SC2154
-trap 'kill -9 $tg__main_PID >/dev/null 2>&1; kill -9 $tg__event_PID >/dev/null 2>&1' EXIT
+trap 'set +u; kill -9 $tg__main_PID >/dev/null 2>&1; kill -9 $tg__event_PID >/dev/null 2>&1' EXIT
 
 
 
