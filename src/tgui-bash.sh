@@ -384,7 +384,7 @@ function tg_json_send() {
   if [ "$2" != "" ]; then
     local -n tg_json_send_params="$2"
     if [ "${#tg_json_send_params[@]}" -ne 0 ]; then
-      for key in "${!params[@]}"; do
+      for key in "${!tg_json_send_params[@]}"; do
         tosend="${tosend}"'"'"$key"'":'"${tg_json_send_params[$key]},"
       done
       tosend=${tosend::-1}"}}"
