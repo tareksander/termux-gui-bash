@@ -1210,17 +1210,13 @@ coproc tg__event { exec 2>&3 3>&- ; $helper "$sock_event" ; }
 
 exec 2>&3 3>&-
 
-
+# contact plugin
 # use termux-am if available
-if ! command -v termux-am &>/dev/null; then
-  am_command="termux-am"
-else
-  am_command="am"
+if ! termux-am broadcast -n com.termux.gui/.GUIReceiver --es mainSocket "$sock_main" --es eventSocket "$sock_event" >/dev/null 2>&1; then
+  am broadcast -n com.termux.gui/.GUIReceiver --es mainSocket "$sock_main" --es eventSocket "$sock_event" >/dev/null 2>&1
 fi
 
 
-# contact plugin
-$am_command broadcast -n com.termux.gui/.GUIReceiver --es mainSocket "$sock_main" --es eventSocket "$sock_event" >/dev/null 2>&1
 
 # clear up variables
 unset helper
