@@ -380,22 +380,22 @@ function tg_str_quote() {
 # The second parameter is an associative array name that contains the parameters.
 # String parameters have to be quoted with tg_str_quote.
 function tg_json_send() {
-  local tosend='{"method": "'"$1"'", "params": {'
+  local tg_json_send_tosend='{"method": "'"$1"'", "params": {'
   if [ "$2" != "" ]; then
     local -n tg_json_send_params="$2"
     if [ "${#tg_json_send_params[@]}" -ne 0 ]; then
       for key in "${!tg_json_send_params[@]}"; do
-        tosend="${tosend}"'"'"$key"'":'"${tg_json_send_params[$key]},"
+        tg_json_send_tosend="${tg_json_send_tosend}"'"'"$key"'":'"${tg_json_send_params[$key]},"
       done
-      tosend=${tosend::-1}"}}"
+      tg_json_send_tosend=${tg_json_send_tosend::-1}"}}"
     else
-      tosend=${tosend}"}}"
+      tg_json_send_tosend=${tg_json_send_tosend}"}}"
     fi
   else
-    tosend=${tosend}"}}"
+    tg_json_send_tosend=${tg_json_send_tosend}"}}"
   fi
-  #echo "$tosend"
-  tg_msg_send "$tosend"
+  #echo "$tg_json_send_tosend"
+  tg_msg_send "$tg_json_send_tosend"
 }
 
 function tg__array_copy() {
@@ -434,91 +434,91 @@ function tg_activity_new() {
   local -n tg_activity_new_params="$1"
   local -n tg_activity_new_ret="$2"
   tg_json_send "newActivity" "$1"
-  local rec
-  rec="$(tg_msg_recv)"
+  local tg_activity_rec
+  tg_activity_rec="$(tg_msg_recv)"
   if [ ! -v "tg_activity_new_params[${tgc_actvivity_tid}]" ]; then
-    tg_activity_new_ret[0]="$(echo "$rec" | jq -r '.[0]')"
-    tg_activity_new_ret[1]="$(echo "$rec" | jq -r '.[1]')"
+    tg_activity_new_ret[0]="$(echo "$tg_activity_rec" | jq -r '.[0]')"
+    tg_activity_new_ret[1]="$(echo "$tg_activity_rec" | jq -r '.[1]')"
   else
     # shellcheck disable=SC2034
-    tg_activity_new_ret[0]="$(echo "$rec" | jq -r '.')"
+    tg_activity_new_ret[0]="$(echo "$tg_activity_rec" | jq -r '.')"
   fi
 }
 
 function tg_activity_finish() {
-  declare -A params=([aid]="$1")
-  tg_json_send "finishActivity" params
+  declare -A tg__local_params=([aid]="$1")
+  tg_json_send "finishActivity" tg__local_params
 }
 
 function tg_activity_to_back() {
-  declare -A params=([aid]="$1")
-  tg_json_send "moveTaskToBack" params
+  declare -A tg__local_params=([aid]="$1")
+  tg_json_send "moveTaskToBack" tg__local_params
 }
 
 function tg_activity_theme() {
-  declare -A params=([aid]="$1" [statusBarColor]="$(tg__hex_to_dec "$2")" [colorPrimary]="$(tg__hex_to_dec "$3")" [windowBackground]="$(tg__hex_to_dec "$4")" [textColor]="$(tg__hex_to_dec "$5")" [colorAccent]="$(tg__hex_to_dec "$6")")
-  tg_json_send "setTheme" params
+  declare -A tg__local_params=([aid]="$1" [statusBarColor]="$(tg__hex_to_dec "$2")" [colorPrimary]="$(tg__hex_to_dec "$3")" [windowBackground]="$(tg__hex_to_dec "$4")" [textColor]="$(tg__hex_to_dec "$5")" [colorAccent]="$(tg__hex_to_dec "$6")")
+  tg_json_send "setTheme" tg__local_params
 }
 
 function tg_activity_description() {
-  declare -A params=([aid]="$1" [label]="$2" [img]="$3")
-  tg_json_send "setTaskDescription" params
+  declare -A tg__local_params=([aid]="$1" [label]="$2" [img]="$3")
+  tg_json_send "setTaskDescription" tg__local_params
 }
 
-function tg_activity_pip_params() {
-  declare -A params=([aid]="$1" [num]="$2" [den]="$3")
-  tg_json_send "setPiPParams" params
+function tg_activity_pip_tg__local_params() {
+  declare -A tg__local_params=([aid]="$1" [num]="$2" [den]="$3")
+  tg_json_send "setPiPParams" tg__local_params
 }
 
 function tg_activity_input() {
-  declare -A params=([aid]="$1" [mode]="$2")
-  tg_json_send "setInputMode" params
+  declare -A tg__local_params=([aid]="$1" [mode]="$2")
+  tg_json_send "setInputMode" tg__local_params
 }
 
 function tg_activity_pip() {
-  declare -A params=([aid]="$1" [pip]="$2")
-  tg_json_send "setPiPMode" params
+  declare -A tg__local_params=([aid]="$1" [pip]="$2")
+  tg_json_send "setPiPMode" tg__local_params
 }
 
 function tg_activity_pip_auto() {
-  declare -A params=([aid]="$1" [pip]="$2")
-  tg_json_send "setPiPModeAuto" params
+  declare -A tg__local_params=([aid]="$1" [pip]="$2")
+  tg_json_send "setPiPModeAuto" tg__local_params
 }
 
 function tg_activity_keep_screen_on() {
-  declare -A params=([aid]="$1" [on]="$2")
-  tg_json_send "keepScreenOn" params
+  declare -A tg__local_params=([aid]="$1" [on]="$2")
+  tg_json_send "keepScreenOn" tg__local_params
 }
 
 function tg_activity_orientation() {
-  declare -A params=([aid]="$1" [orientation]="$2")
-  tg_json_send "setOrientation" params
+  declare -A tg__local_params=([aid]="$1" [orientation]="$2")
+  tg_json_send "setOrientation" tg__local_params
 }
 
 function tg_activity_position() {
-  declare -A params=([aid]="$1" [x]="$2" [y]="$3")
-  tg_json_send "setPosition" params
+  declare -A tg__local_params=([aid]="$1" [x]="$2" [y]="$3")
+  tg_json_send "setPosition" tg__local_params
 }
 
 function tg_activity_configuration() {
-  declare -A params=([aid]="$1")
-  tg_json_send "getConfiguration" params
+  declare -A tg__local_params=([aid]="$1")
+  tg_json_send "getConfiguration" tg__local_params
   tg_msg_recv
 }
 
 function tg_activity_request_unlock() {
-  declare -A params=([aid]="$1")
-  tg_json_send "requestUnlock" params
+  declare -A tg__local_params=([aid]="$1")
+  tg_json_send "requestUnlock" tg__local_params
 }
 
 function tg_activity_hide_soft_keyboard() {
-  declare -A params=([aid]="$1")
-  tg_json_send "hideSoftKeyboard" params
+  declare -A tg__local_params=([aid]="$1")
+  tg_json_send "hideSoftKeyboard" tg__local_params
 }
 
 function tg_activity_intercept_back_button() {
-  declare -A params=([aid]="$1" [intercept]="$2")
-  tg_json_send "interceptBackButton" params
+  declare -A tg__local_params=([aid]="$1" [intercept]="$2")
+  tg_json_send "interceptBackButton" tg__local_params
 }
 
 ### CONFIGURATION METHODS
@@ -565,13 +565,13 @@ function tg_configuration_density() {
 ### TASK METHODS
 
 function tg_task_finish() {
-  declare -A params=([tid]="$1")
-  tg_json_send "finishTask" params
+  declare -A tg__local_params=([tid]="$1")
+  tg_json_send "finishTask" tg__local_params
 }
 
 function tg_task_to_front() {
-  declare -A params=([tid]="$1")
-  tg_json_send "bringTaskToFront" params
+  declare -A tg__local_params=([tid]="$1")
+  tg_json_send "bringTaskToFront" tg__local_params
 }
 
 
@@ -582,21 +582,21 @@ function tg_task_to_front() {
 function tg__create() {
   # shellcheck disable=SC2034
   local -n tg__create_args="$3"
-  declare -A params=([aid]="$2")
-  tg__array_copy tg__create_args params
+  declare -A tg__create_params=([aid]="$2")
+  tg__array_copy tg__create_args tg__create_params
   if [ -v "4" ]; then
-    params[parent]="$4"
+    tg__create_params[parent]="$4"
   fi
   if [ -v "5" ]; then
-    params[visibility]="$5"
+    tg__create_params[visibility]="$5"
   fi
-  if [ -v "params[text]" ]; then
-    params[text]="$(tg_str_quote "${params[text]}")"
+  if [ -v "tg__create_params[text]" ]; then
+    tg__create_params[text]="$(tg_str_quote "${tg__create_params[text]}")"
   fi
-  if [ -v "params[type]" ]; then
-    params[type]="$(tg_str_quote "${params[type]}")"
+  if [ -v "tg__create_params[type]" ]; then
+    tg__create_params[type]="$(tg_str_quote "${tg__create_params[type]}")"
   fi
-  tg_json_send "$1" params
+  tg_json_send "$1" tg__create_params
   tg_msg_recv
 }
 
@@ -694,207 +694,207 @@ function tg_create_web() {
 ### VIEW MANIPULATION
 
 function tg_view_show_cursor() {
-  declare -A params=([aid]="$1" [id]="$2" [show]="$3")
-  tg_json_send "showCursor" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [show]="$3")
+  tg_json_send "showCursor" tg__local_params
 }
 
 function tg_view_linear() {
-  declare -A params=([aid]="$1" [id]="$2")
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
   if [ -v "3" ]; then
-      params[weight]="$3"
+      tg__local_params[weight]="$3"
     fi
   if [ -v "4" ]; then
-    params[position]="$4"
+    tg__local_params[position]="$4"
   fi
-  tg_json_send "setLinearLayoutParams" params
+  tg_json_send "setLinearLayoutParams" tg__local_params
 }
 
 function tg_view_grid() {
-  declare -A params=([aid]="$1" [id]="$2")
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
   if [ -v "3" ]; then
-    params[row]="$3"
+    tg__local_params[row]="$3"
   fi
   if [ -v "4" ]; then
-    params[col]="$4"
+    tg__local_params[col]="$4"
   fi
   if [ -v "5" ]; then
-    params[rowsize]="$5"
+    tg__local_params[rowsize]="$5"
   fi
   if [ -v "6" ]; then
-    params[colsize]="$6"
+    tg__local_params[colsize]="$6"
   fi
   if [ -v "7" ]; then
-    params[alignmentrow]="$(tg_str_quote "$7")"
+    tg__local_params[alignmentrow]="$(tg_str_quote "$7")"
   fi
   if [ -v "8" ]; then
-    params[alignmentcol]="$(tg_str_quote "$8")"
+    tg__local_params[alignmentcol]="$(tg_str_quote "$8")"
   fi
-  tg_json_send "setGridLayoutParams" params
+  tg_json_send "setGridLayoutParams" tg__local_params
 }
 
 function tg_view_location() {
-  declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
   if [ -v "5" ]; then
-    params[dp]="$5"
+    tg__local_params[dp]="$5"
     fi
   if [ -v "6" ]; then
-    params[top]="$6"
+    tg__local_params[top]="$6"
   fi
-  tg_json_send "setViewLocation" params
+  tg_json_send "setViewLocation" tg__local_params
 }
 
 function tg_view_vis() {
-  declare -A params=([aid]="$1" [id]="$2" [vis]="$3")
-  tg_json_send "setVisibility" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [vis]="$3")
+  tg_json_send "setVisibility" tg__local_params
 }
 
 function tg_view_width() {
-  declare -A params=([aid]="$1" [id]="$2" [width]="$3")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [width]="$3")
   if [ -v "4" ]; then
-    params[px]="$4"
+    tg__local_params[px]="$4"
   fi
-  tg_json_send "setWidth" params
+  tg_json_send "setWidth" tg__local_params
 }
 
 function tg_view_height() {
-  declare -A params=([aid]="$1" [id]="$2" [height]="$3")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [height]="$3")
   if [ -v "4" ]; then
-    params[px]="$4"
+    tg__local_params[px]="$4"
   fi
-  tg_json_send "setHeight" params
+  tg_json_send "setHeight" tg__local_params
 }
 
 function tg_view_dimensions() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "getDimensions" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "getDimensions" tg__local_params
   tg_msg_recv
 }
 
 function tg_view_delete() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "deleteView" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "deleteView" tg__local_params
 }
 
 function tg_view_delete_children() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "deleteChildren" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "deleteChildren" tg__local_params
 }
 
 function tg_view_margin() {
-  declare -A params=([aid]="$1" [id]="$2" [margin]="$3")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [margin]="$3")
   if [ -v "4" ]; then
-    params[dir]="$(tg_str_quote "$4")"
+    tg__local_params[dir]="$(tg_str_quote "$4")"
   fi
-  tg_json_send "setMargin" params
+  tg_json_send "setMargin" tg__local_params
 }
 
 function tg_view_padding() {
-  declare -A params=([aid]="$1" [id]="$2" [padding]="$3")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [padding]="$3")
   if [ -v "4" ]; then
-    params[dir]="$(tg_str_quote "$4")"
+    tg__local_params[dir]="$(tg_str_quote "$4")"
   fi
-  tg_json_send "setPadding" params
+  tg_json_send "setPadding" tg__local_params
 }
 
 function tg_view_bg_color() {
-  declare -A params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
-  tg_json_send "setBackgroundColor" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
+  tg_json_send "setBackgroundColor" tg__local_params
 }
 
 function tg_view_text_color() {
-  declare -A params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
-  tg_json_send "setTextColor" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
+  tg_json_send "setTextColor" tg__local_params
 }
 
 function tg_view_progress() {
-  declare -A params=([aid]="$1" [id]="$2" [progress]="$3")
-  tg_json_send "setProgress" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [progress]="$3")
+  tg_json_send "setProgress" tg__local_params
 }
 
 function tg_view_refreshing() {
-  declare -A params=([aid]="$1" [id]="$2" [refresh]="$3")
-  tg_json_send "setRefreshing" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [refresh]="$3")
+  tg_json_send "setRefreshing" tg__local_params
 }
 
 function tg_view_text() {
-  declare -A params=([aid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
-  tg_json_send "setText" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
+  tg_json_send "setText" tg__local_params
 }
 
 function tg_view_gravity() {
-  declare -A params=([aid]="$1" [id]="$2" [horizontal]="$3" [vertical]="$4")
-  tg_json_send "setGravity" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [horizontal]="$3" [vertical]="$4")
+  tg_json_send "setGravity" tg__local_params
 }
 
 function tg_view_text_size() {
-  declare -A params=([aid]="$1" [id]="$2" [size]="$3")
-  tg_json_send "setTextSize" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [size]="$3")
+  tg_json_send "setTextSize" tg__local_params
 }
 
 function tg_view_get_text() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "getText" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "getText" tg__local_params
   tg_msg_recv | jq -r '.'
 }
 
 function tg_view_checked() {
-  declare -A params=([aid]="$1" [id]="$2" [checked]="$3")
-  tg_json_send "setChecked" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [checked]="$3")
+  tg_json_send "setChecked" tg__local_params
 }
 
 function tg_view_request_focus() {
-  declare -A params=([aid]="$1" [id]="$2" [forcesoft]="$3")
-  tg_json_send "requestFocus" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [forcesoft]="$3")
+  tg_json_send "requestFocus" tg__local_params
 }
 
 function tg_view_get_scroll() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "getScrollPosition" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "getScrollPosition" tg__local_params
   tg_msg_recv
 }
 
 function tg_view_set_scroll() {
-  declare -A params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [x]="$3" [y]="$4")
   if [ -v "5" ]; then
-    params[soft]="$5"
+    tg__local_params[soft]="$5"
   fi
-  tg_json_send "setScrollPosition" params
+  tg_json_send "setScrollPosition" tg__local_params
 }
 
 function tg_view_list() {
-  declare -A params=([aid]="$1" [id]="$2")
+  declare -A tg_view_list_params=([aid]="$1" [id]="$2")
   local -n tg_view_list_list="$3"
-  local array="["
+  local tg_view_list_array="["
   for key in "${!tg_view_list_list[@]}"; do
-    array="${array}$(tg_str_quote "${tg_view_list_list["$key"]}"),"
+    tg_view_list_array="${tg_view_list_array}$(tg_str_quote "${tg_view_list_list["$key"]}"),"
   done
-  if [ "${!tg_view_list_list[@]}" ]; then
-    array="${array::-1}]"
+  if [ "${#tg_view_list_list[@]}" ]; then
+    tg_view_list_array="${tg_view_list_array::-1}]"
   else
-    array="$array]"
+    tg_view_list_array="$tg_view_list_array]"
   fi
-  params[list]="$array"
-  tg_json_send "setList" params
+  tg_view_list_params[list]="$tg_view_list_array"
+  tg_json_send "setList" tg_view_list_params
 }
 
 function tg_view_image() {
-  declare -A params=([aid]="$1" [id]="$2" [img]='"'"$3"'"')
-  tg_json_send "setImage" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [img]='"'"$3"'"')
+  tg_json_send "setImage" tg__local_params
 }
 
 function tg_view_select_tab() {
-  declare -A params=([aid]="$1" [id]="$2" [tab]="$3")
-  tg_json_send "selectTab" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [tab]="$3")
+  tg_json_send "selectTab" tg__local_params
 }
 
 function tg_view_select_item() {
-  declare -A params=([aid]="$1" [id]="$2" [item]="$3")
-  tg_json_send "selectItem" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [item]="$3")
+  tg_json_send "selectItem" tg__local_params
 }
 
 function tg_view_clickable() {
-  declare -A params=([aid]="$1" [id]="$2" [clickable]="$3")
-  tg_json_send "setClickable" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [clickable]="$3")
+  tg_json_send "setClickable" tg__local_params
 }
 
 
@@ -913,145 +913,145 @@ function tg_view_clickable() {
 ### REMOTE LAYOUTS, WIDGETS & NOTIFICATIONS
 
 function tg_remote_create_layout() {
-  declare -A params=()
-  tg_json_send "createRemoteLayout" params
+  declare -A tg__local_params=()
+  tg_json_send "createRemoteLayout" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_delete_layout() {
-  declare -A params=([rid]="$1")
-  tg_json_send "deleteRemoteLayout" params
+  declare -A tg__local_params=([rid]="$1")
+  tg_json_send "deleteRemoteLayout" tg__local_params
 }
 
 function tg_remote_create_frame() {
-  declare -A params=([rid]="$1")
+  declare -A tg__local_params=([rid]="$1")
   if [ -v "2" ]; then
-    params[parent]="$2"
+    tg__local_params[parent]="$2"
   fi
-  tg_json_send "addRemoteFrameLayout" params
+  tg_json_send "addRemoteFrameLayout" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_create_text() {
-  declare -A params=([rid]="$1")
+  declare -A tg__local_params=([rid]="$1")
   if [ -v "2" ]; then
-    params[parent]="$2"
+    tg__local_params[parent]="$2"
   fi
-  tg_json_send "addRemoteTextView" params
+  tg_json_send "addRemoteTextView" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_create_button() {
-  declare -A params=([rid]="$1")
+  declare -A tg__local_params=([rid]="$1")
   if [ -v "2" ]; then
-    params[parent]="$2"
+    tg__local_params[parent]="$2"
   fi
-  tg_json_send "addRemoteButton" params
+  tg_json_send "addRemoteButton" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_create_image() {
-  declare -A params=([rid]="$1")
+  declare -A tg__local_params=([rid]="$1")
   if [ -v "2" ]; then
-    params[parent]="$2"
+    tg__local_params[parent]="$2"
   fi
-  tg_json_send "addRemoteImageView" params
+  tg_json_send "addRemoteImageView" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_create_progress() {
-  declare -A params=([rid]="$1")
+  declare -A tg__local_params=([rid]="$1")
   if [ -v "2" ]; then
-    params[parent]="$2"
+    tg__local_params[parent]="$2"
   fi
-  tg_json_send "addRemoteProgressBar" params
+  tg_json_send "addRemoteProgressBar" tg__local_params
   tg_msg_recv
 }
 
 function tg_remote_bg_color() {
-  declare -A params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
-  tg_json_send "setRemoteBackgroundColor" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
+  tg_json_send "setRemoteBackgroundColor" tg__local_params
 }
 
 function tg_remote_progress() {
-  declare -A params=([rid]="$1" [id]="$2" [progress]="$3" [max]=100)
-  tg_json_send "setRemoteProgressBar" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [progress]="$3" [max]=100)
+  tg_json_send "setRemoteProgressBar" tg__local_params
 }
 
 function tg_remote_text() {
-  declare -A params=([rid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
-  tg_json_send "setRemoteText" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [text]="$(tg_str_quote "$3")")
+  tg_json_send "setRemoteText" tg__local_params
 }
 
 function tg_remote_text_size() {
-  declare -A params=([rid]="$1" [id]="$2" [size]="$3")
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [size]="$3")
   if [ -v "4" ]; then
-    params[px]="$4"
+    tg__local_params[px]="$4"
   fi
-  tg_json_send "setRemoteTextSize" params
+  tg_json_send "setRemoteTextSize" tg__local_params
 }
 
 function tg_remote_text_color() {
-  declare -A params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
-  tg_json_send "setRemoteTextColor" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [color]="$(tg__hex_to_dec "$3")")
+  tg_json_send "setRemoteTextColor" tg__local_params
 }
 
 function tg_remote_vis() {
-  declare -A params=([rid]="$1" [id]="$2" [vis]="$3")
-  tg_json_send "setRemoteVisibility" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [vis]="$3")
+  tg_json_send "setRemoteVisibility" tg__local_params
 }
 
 function tg_remote_padding() {
-  declare -A params=([rid]="$1" [id]="$2")
+  declare -A tg__local_params=([rid]="$1" [id]="$2")
   if [ -v "3" ]; then
-    params[top]="$3"
+    tg__local_params[top]="$3"
   fi
   if [ -v "4" ]; then
-    params[right]="$4"
+    tg__local_params[right]="$4"
   fi
   if [ -v "5" ]; then
-    params[bottom]="$5"
+    tg__local_params[bottom]="$5"
   fi
   if [ -v "6" ]; then
-    params[left]="$6"
+    tg__local_params[left]="$6"
   fi
-  tg_json_send "setRemotePadding" params
+  tg_json_send "setRemotePadding" tg__local_params
 }
 
 function tg_remote_image() {
-  declare -A params=([rid]="$1" [id]="$2" [img]="$(tg_str_quote "$3")")
-  tg_json_send "setRemoteImage" params
+  declare -A tg__local_params=([rid]="$1" [id]="$2" [img]="$(tg_str_quote "$3")")
+  tg_json_send "setRemoteImage" tg__local_params
 }
 
 function tg_widget_layout() {
-  declare -A params=([rid]="$1" [wid]="$2")
-  tg_json_send "setWidgetLayout" params
+  declare -A tg__local_params=([rid]="$1" [wid]="$2")
+  tg_json_send "setWidgetLayout" tg__local_params
 }
 
 function tg_not_create_channel() {
-  declare -A params=([id]="$(tg_str_quote "$1")" [importance]="$2" [name]="$(tg_str_quote "$3")")
-  tg_json_send "createNotificationChannel" params
+  declare -A tg__local_params=([id]="$(tg_str_quote "$1")" [importance]="$2" [name]="$(tg_str_quote "$3")")
+  tg_json_send "createNotificationChannel" tg__local_params
 }
 
 function tg_not_create() {
-  declare -A params=([channel]="$(tg_str_quote "$1")" [importance]="$2")
+  declare -A tg__local_params=([channel]="$(tg_str_quote "$1")" [importance]="$2")
   # shellcheck disable=SC2034
   local -n tg_not_create_args="$3"
-  tg__array_copy tg_not_create_args params
-  if [ -v "params[title]" ]; then
-    params[title]="$(tg_str_quote "${params[title]}")"
+  tg__array_copy tg_not_create_args tg__local_params
+  if [ -v "tg__local_params[title]" ]; then
+    tg__local_params[title]="$(tg_str_quote "${tg__local_params[title]}")"
   fi
-  if [ -v "params[content]" ]; then
-    params[content]="$(tg_str_quote "${params[content]}")"
+  if [ -v "tg__local_params[content]" ]; then
+    tg__local_params[content]="$(tg_str_quote "${tg__local_params[content]}")"
   fi
-  if [ -v "params[largeImage]" ]; then
-    params[largeImage]="$(tg_str_quote "${params[largeImage]}")"
+  if [ -v "tg__local_params[largeImage]" ]; then
+    tg__local_params[largeImage]="$(tg_str_quote "${tg__local_params[largeImage]}")"
   fi
-  if [ -v "params[largeText]" ]; then
-    params[largeText]="$(tg_str_quote "${params[largeText]}")"
+  if [ -v "tg__local_params[largeText]" ]; then
+    tg__local_params[largeText]="$(tg_str_quote "${tg__local_params[largeText]}")"
   fi
-  if [ -v "params[icon]" ]; then
-    params[icon]="$(tg_str_quote "${params[icon]}")"
+  if [ -v "tg__local_params[icon]" ]; then
+    tg__local_params[icon]="$(tg_str_quote "${tg__local_params[icon]}")"
   fi
   if [ -v "3" ]; then
     local -n tg_not_create_actions="$3"
@@ -1059,19 +1059,19 @@ function tg_not_create() {
     for key in "${!tg_not_create_actions[@]}"; do
       array="${array}$(tg_str_quote "${tg_not_create_actions["$key"]}"),"
     done
-    if [ "${!tg_not_create_actions[@]}" ]; then
+    if [ "${#tg_not_create_actions[@]}" ]; then
       array="${array::-1}]"
     else
       array="$array]"
     fi
-    params[actions]="$array"
+    tg__local_params[actions]="$array"
   fi
-  tg_json_send "createNotification" params
+  tg_json_send "createNotification" tg__local_params
 }
 
 function tg_not_cancel() {
-  declare -A params=([id]="$1")
-  tg_json_send "cancelNotification" params
+  declare -A tg__local_params=([id]="$1")
+  tg_json_send "cancelNotification" tg__local_params
 }
 
 ### EVENT CONTROL
@@ -1079,28 +1079,28 @@ function tg_not_cancel() {
 
 
 function tg_event_send_click() {
-  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
-  tg_json_send "sendClickEvent" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendClickEvent" tg__local_params
 }
 
 function tg_event_send_long_click() {
-  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
-  tg_json_send "sendLongClickEvent" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendLongClickEvent" tg__local_params
 }
 
 function tg_event_send_focus() {
-  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
-  tg_json_send "sendFocusChangeEvent" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendFocusChangeEvent" tg__local_params
 }
 
 function tg_event_send_touch() {
-  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
-  tg_json_send "sendTouchEvent" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendTouchEvent" tg__local_params
 }
 
 function tg_event_send_text() {
-  declare -A params=([aid]="$1" [id]="$2" [send]="$3")
-  tg_json_send "sendTextEvent" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [send]="$3")
+  tg_json_send "sendTextEvent" tg__local_params
 }
 
 
@@ -1112,43 +1112,43 @@ function tg_event_send_text() {
 ### WEBVIEW
 
 function tg_web_allow_js() {
-  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
-  tg_json_send "allowJavascript" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowJavascript" tg__local_params
 }
 
 function tg_web_allow_content() {
-  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
-  tg_json_send "allowContentURI" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowContentURI" tg__local_params
 }
 
 function tg_web_set_data() {
-  declare -A params=([aid]="$1" [id]="$2" [doc]="$(tg_str_quote "$3")")
-  tg_json_send "setData" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [doc]="$(tg_str_quote "$3")")
+  tg_json_send "setData" tg__local_params
 }
 
 function tg_web_load_uri() {
-  declare -A params=([aid]="$1" [id]="$2" [uri]="$(tg_str_quote "$3")")
-  tg_json_send "loadURI" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [uri]="$(tg_str_quote "$3")")
+  tg_json_send "loadURI" tg__local_params
 }
 
 function tg_web_allow_navigation() {
-  declare -A params=([aid]="$1" [id]="$2" [allow]="$3")
-  tg_json_send "allowNavigation" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [allow]="$3")
+  tg_json_send "allowNavigation" tg__local_params
 }
 
 function tg_web_back() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "goBack" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "goBack" tg__local_params
 }
 
 function tg_web_forward() {
-  declare -A params=([aid]="$1" [id]="$2")
-  tg_json_send "goForward" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2")
+  tg_json_send "goForward" tg__local_params
 }
 
 function tg_web_eval_js() {
-  declare -A params=([aid]="$1" [id]="$2" [code]="$(tg_str_quote "$3")")
-  tg_json_send "evaluateJS" params
+  declare -A tg__local_params=([aid]="$1" [id]="$2" [code]="$(tg_str_quote "$3")")
+  tg_json_send "evaluateJS" tg__local_params
 }
 
 
