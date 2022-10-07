@@ -1,5 +1,7 @@
 #!/bin/tgui-bash
 
+set -u
+
 # Parameters for the Activity, can be empty
 declare -A aparams=()
 # Array to store the Activity id and Task id in
