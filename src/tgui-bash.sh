@@ -107,7 +107,7 @@ fi
 
 # Check if jq is installed
 if ! command -v jq &>/dev/null; then
-  echo "jq not installed. pPlease install jq with 'pkg i jq'" >&2
+  echo "jq not installed. Please install jq with 'pkg i jq'" >&2
   exit 1
 fi
 
