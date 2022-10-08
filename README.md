@@ -7,6 +7,10 @@ Bash library for Termux:GUI.
 
 ### Installing
 
+#### With `pkg`
+
+Use `pkg install termux-gui-bash` to install.
+
 #### From Source
 
 Additional dependency: CMake
@@ -19,6 +23,8 @@ make install
 ````
 
 ### Dependencies
+
+Only need to be installed manually when building from source.
 
 - [jq](https://github.com/stedolan/jq)
 - Bash (should be installed by default in Termux)
