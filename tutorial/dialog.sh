@@ -4,7 +4,7 @@ set -u
 
 
 # Let the Activity start as a dialog
-declare -A aparams=([$tgc_actvivity_dialog]="true")
+declare -A aparams=([$tgc_activity_dialog]="true")
 declare -a activity=()
 
 tg_activity_new aparams activity

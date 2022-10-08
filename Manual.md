@@ -261,32 +261,32 @@ All these functions get the Activity id and the View id as the first and second 
 
 
 
-#### tgc_actvivity_tid="tid"
+#### tgc_activity_tid="tid"
 Key for the `tg_activity_new` options array. The value is a number.
 Specify a Task id here if you want Activities to launch over each other in the same Task.
 
-#### tgc_actvivity_dialog="dialog"
+#### tgc_activity_dialog="dialog"
 Key for the `tg_activity_new` options array. The value is a boolean.
 Set this to make the Activity a dialog.
 
-#### tgc_actvivity_canceloutside="canceloutside"
+#### tgc_activity_canceloutside="canceloutside"
 Key for the `tg_activity_new` options array. The value is a boolean.
 Set this to false if you want your dialog to not be dismissed when the user taps on something else.
 
-#### tgc_actvivity_pip="pip"
+#### tgc_activity_pip="pip"
 Key for the `tg_activity_new` options array. The value is a boolean.
 Set this to let the Activity start in picture-in-picture mode.
 
-#### tgc_actvivity_lockscreen="lockscreen"
+#### tgc_activity_lockscreen="lockscreen"
 Key for the `tg_activity_new` options array. The value is a boolean.
 Set this to make the Activity stay visible and interactable on the lockscreen.
 Make sure your interface is secure in this case, to not allow arbitrary command execution or file I/O.
 
-#### tgc_actvivity_overlay="overlay"
+#### tgc_activity_overlay="overlay"
 Key for the `tg_activity_new` options array. The value is a boolean.
 This launches the Activity as an overlay over everything else, similar to picture-in-picture mode, but you can interact with all Views.
 
-#### tgc_actvivity_intercept="intercept"
+#### tgc_activity_intercept="intercept"
 Key for the `tg_activity_new` options array. The value is a boolean.
 This option makes the back button send an event instead of finishing the Activity.
 

@@ -125,19 +125,19 @@ function tg__hex_to_dec() {
 
 ### CONSTANTS
 
-declare -r tgc_actvivity_tid="tid"
+declare -r tgc_activity_tid="tid"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_dialog="dialog"
+declare -r tgc_activity_dialog="dialog"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_canceloutside="canceloutside"
+declare -r tgc_activity_canceloutside="canceloutside"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_pip="pip"
+declare -r tgc_activity_pip="pip"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_lockscreen="lockscreen"
+declare -r tgc_activity_lockscreen="lockscreen"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_overlay="overlay"
+declare -r tgc_activity_overlay="overlay"
 # shellcheck disable=SC2034
-declare -r tgc_actvivity_intercept="intercept"
+declare -r tgc_activity_intercept="intercept"
 
 
 # shellcheck disable=SC2034
@@ -436,7 +436,7 @@ function tg_activity_new() {
   tg_json_send "newActivity" "$1"
   local tg_activity_rec
   tg_activity_rec="$(tg_msg_recv)"
-  if [ ! -v "tg_activity_new_params[${tgc_actvivity_tid}]" ]; then
+  if [ ! -v "tg_activity_new_params[${tgc_activity_tid}]" ]; then
     tg_activity_new_ret[0]="$(echo "$tg_activity_rec" | jq -r '.[0]')"
     tg_activity_new_ret[1]="$(echo "$tg_activity_rec" | jq -r '.[1]')"
   else
