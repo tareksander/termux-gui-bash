@@ -7,15 +7,16 @@ if [ $# -ge 1 ] && [ "$1" = "--" ]; then
   shift
 fi
 
+if (return 0 2>/dev/null); then
+  echo 'tgui-bash does not support sourcing' >&2
+  exit 1
+fi
+
 if [ $# -lt 1 ] && ! (return 0 2>/dev/null); then
   echo 'Usage: tgui-bash path ...' >&2
   exit 1
 fi
 
-if [ $# -ne 0 ] && (return 0 2>/dev/null); then
-  echo 'When sourced, tgui-bash needs no arguments' >&2
-  exit 1
-fi
 
 if [ $# -ge 1 ] && [ "$1" = "-h" ]; then
   if [ "$2" = 0 ]; then
@@ -1204,7 +1205,7 @@ trap 'set +u; kill -9 $tg__main_PID >/dev/null 2>&1; kill -9 $tg__event_PID >/de
 
 
 
-# start listening on teh sockets
+# start listening on the sockets
 coproc tg__main { $helper --main "$sock_main" ; }
 
 # redirect stderr, save it and restore it, to suppress the warning for running 2 coprocs
@@ -1224,13 +1225,11 @@ fi
 
 # clear up variables
 unset helper
-unset am_command
 unset sock_main
 unset sock_event
 
 
-# Run user script if not sourced
-if ! (return 0 2>/dev/null); then
-  # shellcheck disable=SC1090
-  . "$@"
-fi
+tg__user_script="$1"
+shift
+# shellcheck disable=SC1090
+. "$tg__user_script" "$@"

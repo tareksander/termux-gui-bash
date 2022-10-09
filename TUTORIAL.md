@@ -9,7 +9,7 @@ The full source code can also be found in the tutorial folder.
 
 To use the library, you have 2 options:
 - Use the shebang `#!/bin/tgui-bash` instead of `#!/bin/bash`. The library will initialize itself and then load your script.
-- Source the library with `. tgui-bash --`.
+- Exec tgui-bash with your script path as argument when tgui-bash is not loaded: `! [ -v tgc_activity_tid ] && exec tgui-bash "${BASH_SOURCE[0]}" "$@"`.
 
 The library exits when your script exits, and all remaining Activities are cleaned up by the Plugin after that.
 
