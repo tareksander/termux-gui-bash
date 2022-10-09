@@ -3,6 +3,10 @@
 # unset variables from the extract script
 unset archivestart
 
+if [ $# -ge 1 ] && [ "$1" = "--" ]; then
+  shift
+fi
+
 if [ $# -lt 1 ] && ! (return 0 2>/dev/null); then
   echo 'Usage: tgui-bash path ...' >&2
   exit 1
@@ -13,7 +17,7 @@ if [ $# -ne 0 ] && (return 0 2>/dev/null); then
   exit 1
 fi
 
-if [ "$1" = "-h" ]; then
+if [ $# -ge 1 ] && [ "$1" = "-h" ]; then
   if [ "$2" = 0 ]; then
     docpath="@TERMUX_PREFIX@/share/tgui-bash/manual"
   fi

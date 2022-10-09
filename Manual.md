@@ -9,7 +9,7 @@ source **tgui-bash**
 ## Description
 Sets up a connection to the Termux:GUI plugin through a small C helper, defines functions to interact with the plugin and finally sources the parameter into the script, so the functions are available.  
   
-Can be used in a shebang (`#!/bin/tgui-bash`) or sourced.
+Can be used in a shebang (`#!/bin/tgui-bash`) or sourced (`. tgui-bash --`).
   
 Using `set -eo pipefail` is advised to make your script exit when the connection to the plugin gets broken.
 For development, you should use `set -u` to make sure you spelled the constant names correctly.
