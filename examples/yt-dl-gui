@@ -1,0 +1,187 @@
+#!/bin/tgui-bash
+
+set -uo pipefail
+
+# Parse options
+opts="$(exec -a "yt-dl-gui" getopt -s bash -n "yt-dl-gui" -o "dht" -l "dialog,help,no-thumbnail" -- "$@")"
+if [ $? -ne 0 ]; then
+  exit 1
+fi
+eval set -- "$opts"
+unset opts
+
+dialog=false
+thumbnail=true
+
+
+function print_help() {
+  cat <<"EOF"
+Usage:
+ yt-dl-gui [options] url
+ 
+ Download a Youtube video with youtube-dl.
+ 
+Options:
+  -h  --help        Print this help.
+  -d  --dialog      Use a dialog instead of a fullscreen window.
+  -n --no-thumbnail Don't load and display the thumbnail.
+EOF
+  exit 1
+}
+
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    -d|--dialog) dialog=true; shift;;
+    -h|--help) print_help;;
+    -t|--no-thumbnail) thumbnail=""; shift;;
+    --) shift; break;;
+  esac
+done
+
+if [ $# -ne 1 ]; then
+  echo "yt-dl-gui: One video url needed." >&2
+  exit 1
+fi
+
+# Check for youtube-dl
+if ! command -v youtube-dl &>/dev/null; then
+  read -r -p "youtube-dl not found. Install? (y/N)  "
+  if [ "$REPLY" = "y" ]; then
+    pip install youtube-dl
+  else
+    exit 1
+  fi
+fi
+
+# Check for ffmpeg
+if ! command -v youtube-dl &>/dev/null; then
+  read -r -p "ffmpeg not found. Install? (y/N)  "
+  if [ "$REPLY" = "y" ]; then
+    pkg install ffmpeg
+  else
+    exit 1
+  fi
+fi
+
+# Get video info
+info_json="$(youtube-dl -j "$1")"
+if [ $? -ne 0 ]; then
+  echo "youtube-dl error" >&2
+  exit 1
+fi
+
+thumbnail_url="$(echo "$info_json" | jq -r '.thumbnail')"
+
+
+
+
+# Create the UI
+
+declare -A aparams=([$tgc_activity_dialog]="$dialog")
+declare -a activity
+
+tg_activity_new aparams activity
+
+
+aid="${activity[0]}"
+
+declare -A params=()
+
+layout="$(tg_create_linear "$aid" params)"
+tg_view_margin "$aid" "$layout" 10
+
+if [ "$thumbnail" ]; then
+  thumbnail="$(curl -s "$thumbnail_url" | base64 -w 0)"
+  ti="$(tg_create_image "$aid" params "$layout")"
+  tg_view_image "$aid" "$ti" "$thumbnail"
+  tg_view_height "$aid" "$ti" "$tgc_view_wrap_content"
+  tg_view_linear "$aid" "$ti" 0
+fi
+
+params[$tgc_create_text]="Filename:"
+filenametext="$(tg_create_text "$aid" params "$layout")"
+tg_view_height "$aid" "$filenametext" "$tgc_view_wrap_content"
+tg_view_linear "$aid" "$filenametext" 0
+unset "params[$tgc_create_text]"
+
+
+params[$tgc_create_single_line]=true
+filenameedit="$(tg_create_edit "$aid" params "$layout")"
+tg_view_height "$aid" "$filenameedit" "$tgc_view_wrap_content"
+tg_view_linear "$aid" "$filenameedit" 0
+unset "params[$tgc_create_single_line]"
+
+tg_view_text "$aid" "$filenameedit" "$(echo "$info_json" | jq -r '.title').mp4"
+
+aformats="$(echo "$info_json" | jq '.formats[] | select(.vcodec == "none")')"
+vformats="$(echo "$info_json" | jq '.formats[] | select(.acodec == "none")')"
+
+readarray aformatsarray < <(echo "$aformats" | jq -r '.format')
+readarray vformatsarray < <(echo "$vformats" | jq -r '.format')
+
+params[$tgc_create_vertical]=false
+bar="$(tg_create_linear "$aid" params "$layout")"
+unset "params[$tgc_create_vertical]"
+
+tg_view_height "$aid" "$bar" "$tgc_view_wrap_content"
+tg_view_linear "$aid" "$bar" 0
+
+alayout="$(tg_create_linear "$aid" params "$bar")"
+vlayout="$(tg_create_linear "$aid" params "$bar")"
+
+tg_view_width "$aid" "$alayout" 0
+tg_view_width "$aid" "$vlayout" 0
+
+aspin="$(tg_create_spinner "$aid" params "$alayout")"
+vspin="$(tg_create_spinner "$aid" params "$vlayout")"
+
+tg_view_list "$aid" "$aspin" aformatsarray
+tg_view_list "$aid" "$vspin" vformatsarray
+
+asize="$(tg_create_text "$aid" params "$alayout")"
+vsize="$(tg_create_text "$aid" params "$vlayout")"
+
+params[$tgc_create_text]="Download"
+download="$(tg_create_button "$aid" params "$layout")"
+tg_view_height "$aid" "$download" "$tgc_view_wrap_content"
+tg_view_linear "$aid" "$download" 0
+unset "params[$tgc_create_text]"
+
+acodec=""
+vcodec=""
+
+while true; do
+  ev="$(tg_msg_recv_event_blocking)"
+  if [ "$(tg_event_type "$ev")" = "$tgc_ev_destroy" ]; then
+    exit 0
+  fi
+  if [ "$(tg_event_type "$ev")" = "$tgc_ev_item_selected" ]; then
+    # Handle format selection
+    if [ "$(tg_event_id "$ev")" = "$aspin" ]; then
+      sel="$(echo "$ev" | jq -r '.value.selected')"
+      acodec="$(echo "$aformats" | jq -r --arg sel "$sel" 'select(.format == $sel).format_id')"
+      size="$(echo "$aformats" | jq --arg sel "$sel" 'select(.format == $sel).filesize')"
+      tg_view_text "$aid" "$asize" "$((size / 1000 / 1000)) MB"
+    fi
+    if [ "$(tg_event_id "$ev")" = "$vspin" ]; then
+      sel="$(echo "$ev" | jq -r '.value.selected')"
+      vcodec="$(echo "$vformats" | jq -r --arg sel "$sel" 'select(.format == $sel).format_id')"
+      size="$(echo "$vformats" | jq --arg sel "$sel" 'select(.format == $sel).filesize')"
+      tg_view_text "$aid" "$vsize" "$((size / 1000 / 1000)) MB"
+      # Replace file extension automatically
+      filename="$(tg_view_get_text "$aid" "$filenameedit")"
+      filename="${filename%.*}.$(echo "$vformats" | jq -r --arg sel "$sel" 'select(.format == $sel).ext')"
+      tg_view_text "$aid" "$filenameedit" "$filename"
+    fi
+  fi
+  if [ "$(tg_event_type "$ev")" = "$tgc_ev_click" ] && [ "$(tg_event_id "$ev")" = "$download" ] && [ "$acodec" ] && [ "$vcodec" ]; then
+    filename="$(tg_view_get_text "$aid" "$filenameedit")"
+    # Close the connection to the plugin here, or else it will persist through exec
+    eval "$(trap -p EXIT | cut -d "'" -f 2)"
+    echo youtube-dl -f "'$vcodec+$acodec'" -o "'$filename'" "'$1'"
+    exec youtube-dl -f "$vcodec+$acodec" -o "$filename" "$1"
+  fi
+  
+done
+

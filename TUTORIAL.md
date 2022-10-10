@@ -412,4 +412,6 @@ while true; do
 done
 ````
 
+If you want to see full programs using this, look at [the examples](https://github.com/tareksander/termux-gui-bash/tree/main/examples).
+
 
