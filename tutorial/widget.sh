@@ -42,6 +42,6 @@ while true; do
     tg_remote_text "$rl" "$rt" "$text"
     # Set the widget layout and destroy the remote layout again
     tg_widget_layout "$rl" "$wid"
-    tc_remote_delete_layout "$rl"
+    tg_remote_delete_layout "$rl"
   fi
 done
