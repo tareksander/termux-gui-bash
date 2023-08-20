@@ -470,7 +470,7 @@ function tg_activity_description() {
   tg_json_send "setTaskDescription" tg__local_params
 }
 
-function tg_activity_pip_tg__local_params() {
+function tg_activity_pip_params() {
   declare -A tg__local_params=([aid]="$1" [num]="$2" [den]="$3")
   tg_json_send "setPiPParams" tg__local_params
 }
